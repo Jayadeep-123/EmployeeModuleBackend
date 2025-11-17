@@ -11,6 +11,7 @@ import com.employee.dto.CampusDto;
 import com.employee.dto.GenericDropdownDTO;
 import com.employee.dto.OrganizationDTO;
 import com.employee.entity.Department;
+import com.employee.entity.Employee;
 import com.employee.entity.EmployeeType;
 import com.employee.entity.OrgBank;
 import com.employee.entity.Subject;
@@ -261,5 +262,19 @@ public class DropDownService {
 	        // Now the service calls the repository
 	        return campusContactRepository.findActiveContactsByCampusId(campusId);
 	    }
+	    
+	    
+	    
+	    public List<GenericDropdownDTO> getAllEmployees() {
+			List<Employee> activeEmployees = employeeRepository.findByIsActive(1);
+	 
+			return activeEmployees.stream().map(employee -> new GenericDropdownDTO(employee.getEmp_id(),
+					employee.getFirst_name() + " " + employee.getLast_name())).collect(Collectors.toList());
+		}
+		
+		public List<GenericDropdownDTO> getAllOrganizations() {
+			return organizationRepo.findAll().stream().map(org -> new GenericDropdownDTO(org.getOrganizationId(), org.getOrganizationName()))
+					.collect(Collectors.toList());
+		}
 
 }

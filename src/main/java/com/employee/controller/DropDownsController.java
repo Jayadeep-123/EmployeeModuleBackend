@@ -134,4 +134,15 @@ public class DropDownsController {
 	    public List<CampusContactDTO>  getContactsByCampus(@PathVariable Integer campusId) {
 	        return empDropdownService.getActiveContactsByCampusId(campusId);
 	    }
+	    
+	    
+	    @GetMapping("/organizations")
+		public List<GenericDropdownDTO> getAllOrganizations() {
+			return empDropdownService.getAllOrganizations();
+		}
+		
+		@GetMapping("/all_employees")
+		public List<GenericDropdownDTO> getAllEmployees() {
+			return empDropdownService.getAllEmployees();
+		}
 }
