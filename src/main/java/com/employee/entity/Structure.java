@@ -18,7 +18,7 @@ public class Structure {
 	@Column(name="emp_structure_id")
 	private int empStructureId;
 	
-	@Column(name="structre_name")
+	@Column(name="structure_name")
 	private String structureName;
 	
 	@Column(name="is_active")

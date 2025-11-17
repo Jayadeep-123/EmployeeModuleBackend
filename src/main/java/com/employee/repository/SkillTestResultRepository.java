@@ -12,8 +12,8 @@ public interface SkillTestResultRepository extends JpaRepository<SkillTestResult
 
     @Query("SELECT new com.employee.dto.SkillTestResultDTO("
          + "d.tempPayrollId, "
-         + "CONCAT(d.firstName, ' ', d.lastName), "
-         + "s.subjectName, "
+         + "CONCAT(d.first_name, ' ', d.last_name), "
+         + "s.subject_name, "
          + "r.examDate, "
          + "r.noOfQuestion, "
          + "r.noOfQuesAttempt, "
@@ -22,7 +22,9 @@ public interface SkillTestResultRepository extends JpaRepository<SkillTestResult
          + "r.totalMarks) "
          + "FROM SkillTestResult r "
          + "JOIN r.skillTestDetlId d "
-         + "LEFT JOIN d.subjectId s "
+         // --- THIS IS THE FINAL FIX ---
+         // The field in SkillTestDetails is 'subject', not 'subject_id'
+         + "LEFT JOIN d.subject s "
          + "WHERE d.tempPayrollId = :tempPayrollId "
          + "AND r.isActive = 1 "
          + "ORDER BY r.examDate DESC")

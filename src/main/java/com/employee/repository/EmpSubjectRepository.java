@@ -1,38 +1,50 @@
 package com.employee.repository;
 
 import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.employee.dto.CategoryInfoDTO;
+// Make sure this is the correct path to your new DTO
+import com.employee.dto.CategoryInfoDTO1; 
 import com.employee.entity.EmpSubject;
 
 @Repository
 public interface EmpSubjectRepository extends JpaRepository<EmpSubject, Integer> {
 	
-	
-	@Query("SELECT NEW com.employee.dto.CategoryInfoDTO(" +
-	           "et.empType, " +            // empTypeName
-	           "COALESCE(s.subjectName, null), " +
-	           "d.departmentName, " +
-	           "des.designationName, " +
-	           "COALESCE(sub.agreeNoPeriod, null)" +
+	/**
+	 * This query is now updated to use your new 'CategoryInfoDTO1'.
+	 * The class name is changed, and the fields in the 'NEW'
+	 * clause are re-ordered to match the DTO's constructor.
+	 */
+	@Query("SELECT NEW com.employee.dto.CategoryInfoDTO1(" +
+	           // 1. employeeType (String)
+	           "et.emp_type, " +
+	           // 2. department (String)
+	           "d.department_name, " +
+	           // 3. designation (String)
+	           "des.designation_name, " +
+	           // 4. subject (String)
+	           "COALESCE(s.subject_name, null), " +
+	           // 5. agreedPeriodsPerWeek (Integer)
+	           "COALESCE(sub.agree_no_period, null)" +
 	       ") " +
 	       "FROM Employee e " +
-	       "JOIN e.employeeTypeId et " +
+	       "JOIN e.employee_type_id et " +     
 	       "JOIN e.department d " +
 	       "JOIN e.designation des " +
-	       "LEFT JOIN EmpSubject sub ON sub.empId = e " +
-	       "LEFT JOIN sub.subjectId s " +
+	       "LEFT JOIN EmpSubject sub ON sub.emp_id = e " + 
+	       "LEFT JOIN sub.subject_id s " +                 
 	       "WHERE e.tempPayrollId = :payrollId " +
-	       "AND e.isActive = 1 " +
+	       "AND e.is_active = 1 " +           
 	       "AND et.isActive = 1")
-	List<CategoryInfoDTO> findCategoryInfoByPayrollId(@Param("payrollId") String payrollId);
+	// Note the change in the return type to use the new DTO
+	List<CategoryInfoDTO1> findCategoryInfoByPayrollId(@Param("payrollId") String payrollId);
 	
-	  @Query("SELECT es FROM EmpSubject es WHERE es.empId.empId = :empId AND es.isActive = 1")
+	  /**
+	   * This query was already correct.
+	   */
+	  @Query("SELECT es FROM EmpSubject es WHERE es.emp_id.emp_id = :empId AND es.is_active = 1")
 	    List<EmpSubject> findActiveSubjectsByEmpId(@Param("empId") Integer empId);
 }
-
