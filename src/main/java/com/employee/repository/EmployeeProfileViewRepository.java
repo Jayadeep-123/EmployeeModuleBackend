@@ -11,6 +11,6 @@ import com.employee.entity.EmpProfileView;
 
 public interface EmployeeProfileViewRepository extends JpaRepository<EmpProfileView, Integer>{
 	
-	 Optional<EmpProfileView> findByTempPayrollId(String tempPayrollId);
-
+//	 Optional<EmpProfileView> findByTempPayrollId(String tempPayrollId);
+	Optional<EmpProfileView> findByPayrollId(String payrollId);
 }

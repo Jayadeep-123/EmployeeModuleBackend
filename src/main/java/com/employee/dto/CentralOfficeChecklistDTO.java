@@ -26,4 +26,5 @@ public class CentralOfficeChecklistDTO {
     private String checkListIds; // REQUIRED - Comma-separated checklist IDs (e.g., "1,2,3,4,5,6,7")
    
     private String noticePeriod; // Optional - Notice period (nullable)
+
 }

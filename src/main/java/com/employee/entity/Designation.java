@@ -31,6 +31,8 @@ public class Designation {
 	@JoinColumn(name="department_id")
 	private Department department;
 
+
+
 	
 
 

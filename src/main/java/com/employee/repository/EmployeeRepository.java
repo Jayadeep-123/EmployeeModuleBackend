@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.employee.dto.WorkingInfoDTO;
 import com.employee.entity.Employee;
+import com.employee.entity.EmployeeCheckListStatus;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
@@ -58,4 +59,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
      */
     @Query("SELECT e FROM Employee e WHERE e.is_active = :status")
     List<Employee> findByIsActive(@Param("status") int status);
+
+
+
 }

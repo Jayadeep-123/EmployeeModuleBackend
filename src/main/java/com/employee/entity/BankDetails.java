@@ -2,6 +2,8 @@ package com.employee.entity;
  
 import java.sql.Timestamp;
 
+import com.employee.dto.BankInfoGetDTO;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -71,7 +73,10 @@ public class BankDetails {
 	
 	@Column(name = "updated_date")
 	private Timestamp updatedDate;
- 
+
+	
+
+	
 }
  
  

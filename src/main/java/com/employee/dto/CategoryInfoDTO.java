@@ -1,8 +1,6 @@
 package com.employee.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * DTO for Category Info Tab (Step 7)
