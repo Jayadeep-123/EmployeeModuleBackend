@@ -18,9 +18,12 @@ import com.employee.dto.CategoryInfoDTO1;
 import com.employee.dto.EmpExperienceDetailsDTO;
 import com.employee.dto.EmployeeAgreementDetailsDto;
 import com.employee.dto.EmployeeBankDetailsResponseDTO;
+import com.employee.dto.FamilyDetailsResponseDTO;
 import com.employee.dto.ManagerDTO;
+import com.employee.dto.QualificationInfoDTO;
 import com.employee.dto.ReferenceDTO;
 import com.employee.dto.SkillTestResultDTO;
+import com.employee.dto.WorkingInfoDTO;
 import com.employee.entity.EmpProfileView;
 import com.employee.entity.EmployeeOnboardingView;
 import com.employee.entity.SkillTestApprovalView;
@@ -145,4 +148,56 @@ public class GetEmpDetailsController {
 	        AllDocumentsDTO result = getEmpDetailsService.getAllDocumentsByTempPayrollId(tempPayrollId);
 	        return new ResponseEntity<>(result, HttpStatus.OK);
 	    }
+	    
+	    
+	    @GetMapping("/working-info/{tempPayrollId}")
+	    public ResponseEntity<WorkingInfoDTO> getWorkingInfo(
+	            @PathVariable String tempPayrollId) {
+	        
+	        try {
+	            WorkingInfoDTO dto = getEmpDetailsService.getWorkingInfoByTempPayrollId(tempPayrollId);
+	            return ResponseEntity.ok(dto);
+	        } catch (RuntimeException e) {
+	            // Log the exception and return a 404 Not Found response
+	            // It's best practice to use custom exceptions and proper HTTP status codes.
+	            return ResponseEntity.notFound().build();
+	        }
+	    }
+	    @GetMapping("/Qualification-info/{tempPayrollId}")
+	    public ResponseEntity<QualificationInfoDTO> getHighestQualificationDetails(
+	            @PathVariable String tempPayrollId) {
+	        
+	        try {
+	            QualificationInfoDTO dto = getEmpDetailsService.getHighestQualificationDetails(tempPayrollId);
+	            return ResponseEntity.ok(dto);
+	        } catch (RuntimeException e) {
+	            // Log the exception and return a 404 Not Found response
+	            return ResponseEntity.notFound().build();
+	        }
+	    }
+	    
+	    @GetMapping("/family-info/{tempPayrollId}")
+	    public ResponseEntity<?> getEmployeeFamilyDetails(
+	            @PathVariable String tempPayrollId) {
+	        
+	        try {
+	            List<FamilyDetailsResponseDTO> details =
+	            		getEmpDetailsService.getFamilyDetailsWithAddressInfo(tempPayrollId);
+	            
+	            if (details.isEmpty()) {
+	                return new ResponseEntity<>("No family details found for employee with ID: " + tempPayrollId, HttpStatus.NOT_FOUND);
+	            }
+	            
+	            return new ResponseEntity<>(details, HttpStatus.OK);
+	            
+	        } catch (RuntimeException e) {
+	            // Handle Employee not found or other service-level exceptions
+	            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+	        } catch (Exception e) {
+	            // General internal server error handling
+	            return new ResponseEntity<>("An error occurred while fetching details.", HttpStatus.INTERNAL_SERVER_ERROR);
+	        }
+	    }
+
+ 
 }

@@ -14,6 +14,7 @@ import com.employee.dto.SkillTestDetailsDto;
 import com.employee.entity.SkillTestDetails;
 import com.employee.service.SkillTestDetailsService;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -33,7 +34,7 @@ public class SkillTestDetailsController {
      * The new candidate's details are passed in the request body.
      */
     @PostMapping("/save/{emp_id}")
-    public ResponseEntity<String> saveSkillTestDetails(
+    public ResponseEntity<String> saveSkillTestDetails(@Valid
             @RequestBody SkillTestDetailsDto dto,
             @PathVariable("emp_id") int emp_id) {
         

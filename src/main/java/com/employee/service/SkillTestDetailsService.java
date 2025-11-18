@@ -15,20 +15,24 @@ import com.employee.entity.Campus;
 import com.employee.entity.Employee;
 import com.employee.entity.EmployeeLevel;
 import com.employee.entity.Gender;
+import com.employee.entity.Grade;
 import com.employee.entity.JoiningAs;
 import com.employee.entity.Qualification;
 import com.employee.entity.SkillTestDetails;
 import com.employee.entity.Stream;
+import com.employee.entity.Structure;
 import com.employee.entity.Subject;
 import com.employee.exception.ResourceNotFoundException;
 import com.employee.repository.CampusRepository;
 import com.employee.repository.EmployeeLevelRepository;
 import com.employee.repository.EmployeeRepository;
 import com.employee.repository.GenderRepository;
+import com.employee.repository.GradeRepository;
 import com.employee.repository.JoiningAsRepository;
 import com.employee.repository.QualificationRepository;
 import com.employee.repository.SkillTestDetailsRepository;
 import com.employee.repository.StreamRepository;
+import com.employee.repository.StructureRepository;
 import com.employee.repository.SubjectRepository;
 
 import jakarta.annotation.PostConstruct; 
@@ -58,7 +62,8 @@ public class SkillTestDetailsService {
 	private EmployeeLevelRepository employeeLevelRepository;
 	@Autowired
 	private EmployeeRepository employeeRepository;
-
+   @Autowired GradeRepository graderepository;
+   @Autowired StructureRepository  structurerepository;
 	// This map is filled by the @PostConstruct method
 	private Map<String, AtomicInteger> campusCounters = new ConcurrentHashMap<>();
 
@@ -155,6 +160,13 @@ public class SkillTestDetailsService {
 		EmployeeLevel employeeLevel = employeeLevelRepository.findById(dto.getEmp_level_id()).orElseThrow(
 				() -> new ResourceNotFoundException("EmployeeLevel not found with id: " + dto.getEmp_level_id()));
 
+		Grade grade = graderepository.findById(dto.getEmp_grade_id()).orElseThrow(() -> new ResourceNotFoundException("Grade not found with id: " + dto.getEmp_grade_id()));
+			
+			// NEW: Find Structure (Requires structureRepository)
+			Structure structure = structurerepository.findById(dto.getEmp_structure_id())
+			    .orElseThrow(() -> new ResourceNotFoundException("Structure not found with id: " + dto.getEmp_structure_id()));
+		
+		
 		// 6. Create a new SkillTestDetails entity
 		SkillTestDetails newDetails = new SkillTestDetails();
 
@@ -167,6 +179,8 @@ public class SkillTestDetailsService {
 		newDetails.setEmail(dto.getEmail());
 		newDetails.setTotalExperience(dto.getTotalExperience());
 		newDetails.setContact_number(dto.getContactNumber());
+		newDetails.setEmpGrade(grade);
+		newDetails.setEmpStructure(structure);
 
 		// === YOUR PASSWORD LOGIC (THIS IS CORRECT) ===
 		String firstName = dto.getFirstName();
@@ -203,9 +217,13 @@ public class SkillTestDetailsService {
 		newDetails.setStream(stream);
 		newDetails.setSubject(subject);
 		newDetails.setEmployeeLevel(employeeLevel);
+		newDetails.setEmpGrade(grade);
+		newDetails.setEmpStructure(structure);
+//		newDetails.setEmpGrade(g); 
+//		newDetails.setEmpStructure(structure);
 
 		// 10. Save (No change to this repo call)
 		skillTestDetailsRepository.save(newDetails);
-		return "Data is posted successfully";
+		return "Data is posted successful";
 	}
 }

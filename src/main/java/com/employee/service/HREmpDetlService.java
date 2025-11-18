@@ -27,6 +27,7 @@ import com.employee.dto.EmployeeCurrentInfoDTO.SubjectInfo;
 import com.employee.dto.EmployeeRelationDTO;
 import com.employee.dto.FamilyMemberInOrgDTO;
 import com.employee.dto.QualificationDetailsDto;
+import com.employee.dto.SimilarInstituteEmployeeDTO;
 import com.employee.entity.BankDetails;
 import com.employee.entity.Campus;
 import com.employee.entity.CampusContact;
@@ -50,6 +51,8 @@ import com.employee.repository.EmpSubjectRepository;
 import com.employee.repository.EmpaddressInfoRepository;
 import com.employee.repository.EmployeeRepository;
 import com.employee.repository.OrganizationRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class HREmpDetlService {
@@ -425,7 +428,8 @@ public class HREmpDetlService {
 	    
 	 // Assuming this is inside a Service class that has @Autowired employeeRepository, 
 	 // empChequeDetailsRepository, AND organizationRepository.
-
+	    
+	 @Transactional
 	 public EmployeeAgreementDetailsDto getChequeDetailsByPayrollId(String payrollId) {
 	     
 	     // 1. Find employee using correct field name payRollId (capital R)
@@ -585,4 +589,6 @@ public class HREmpDetlService {
 	            return dto;
 	        }).collect(Collectors.toList());
 	    }
+	    
+	   
 }

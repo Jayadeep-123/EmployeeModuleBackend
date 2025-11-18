@@ -126,6 +126,7 @@ import org.springframework.stereotype.Repository;
 import com.employee.dto.EmpFamilyDetailsDTO;
 import com.employee.dto.FamilyDetailsDTO;
 import com.employee.entity.EmpFamilyDetails;
+import com.employee.entity.Employee;
  
 @Repository
 public interface EmpFamilyDetailsRepository extends JpaRepository<EmpFamilyDetails, Integer> {
@@ -193,4 +194,10 @@ public interface EmpFamilyDetailsRepository extends JpaRepository<EmpFamilyDetai
      */
     @Query("SELECT fd FROM EmpFamilyDetails fd WHERE fd.emp_id.emp_id = :empId")
     List<EmpFamilyDetails> findByEmp_id_EmpId(@Param("empId") int empId);
+    
+    @Query("SELECT f FROM EmpFamilyDetails f WHERE f.emp_id = :employee")
+    List<EmpFamilyDetails> findByEmployeeEntity(@Param("employee") Employee employee);
+ 
+
+
 }

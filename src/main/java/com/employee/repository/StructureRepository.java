@@ -7,4 +7,5 @@ import java.util.List;
 public interface StructureRepository extends JpaRepository<Structure, Integer> {
     // Spring Data auto-generates the query:
     List<Structure> findByIsActive(int isActive);
+  
 }

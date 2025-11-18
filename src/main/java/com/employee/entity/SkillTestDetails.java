@@ -27,6 +27,7 @@ public class SkillTestDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "skill_test_detl_id")
     private Integer skillTestDetlId;
+	@Column(unique = true,length = 12)
 	private String aadhaar_no;
 	
 	@Column(name = "previous_chaitanya_id")
@@ -34,7 +35,7 @@ public class SkillTestDetails {
 
     @Column(name = "first_name", length = 100)
     private String first_name;
-
+    
     @Column(name = "last_name", length = 100)
     private String last_name;
 
@@ -44,10 +45,10 @@ public class SkillTestDetails {
    	@Column(name = "created_by", nullable = false)
    	private Integer created_by = 2; // Default to 1 if not provided
    	
-    @Column(name = "contact_no", length = 15)
+    @Column(name = "contact_no", length = 10,unique = true)
     private Long contact_number;
 
-    @Column(name = "email",  length = 100)
+    @Column(name = "email",  length = 100,unique = true)
     private String email;
 
     @Column(name = "total_experience", length = 50)
@@ -58,6 +59,16 @@ public class SkillTestDetails {
     
     @Column(name ="password")
     private String password;
+    
+    
+//    
+//    @Column(name = "emp_grade_id", nullable = false)
+//    private Integer empgrade_id;
+//    
+//    
+//    @Column(name = "emp_structure_id", nullable = false)
+//    private Integer empstructure_id;
+//    
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gender_id") // This is the Foreign Key
@@ -82,10 +93,23 @@ public class SkillTestDetails {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "emp_level_id") // Foreign Key
-    private EmployeeLevel employeeLevel; // Links to your EmployeeLevel entity
+    private EmployeeLevel employeeLevel; 
+    
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "emp_grade_id") // Foreign Key
+    private Grade empGrade;
+   
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "emp_structure_id") // Foreign Key
+    private Structure empStructure;
+    
+    
+    
     
     @Column(name = "is_active")
     private Integer isActive = 1;
+  
 
 	
 }

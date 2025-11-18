@@ -11,4 +11,5 @@ import com.employee.entity.Grade;
 public interface GradeRepository extends JpaRepository<Grade, Integer> {
 
 	  List<Grade> findByIsActive(int isActive);
+	  
 }

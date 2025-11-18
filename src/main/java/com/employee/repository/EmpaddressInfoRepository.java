@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param; // 2. Add this import
 import org.springframework.stereotype.Repository;
 
 import com.employee.entity.EmpaddressInfo;
+import com.employee.entity.Employee;
 
 @Repository
 public interface EmpaddressInfoRepository extends JpaRepository<EmpaddressInfo, Integer> {
@@ -19,4 +20,7 @@ public interface EmpaddressInfoRepository extends JpaRepository<EmpaddressInfo, 
      */
     @Query("SELECT e FROM EmpaddressInfo e WHERE e.emp_id.payRollId = :payrollId") // 3. Add this @Query
 	List<EmpaddressInfo> findByEmpId_PayrollId(@Param("payrollId") String payrollId); // 4. Add @Param
+    
+    @Query("SELECT a FROM EmpaddressInfo a WHERE a.emp_id = :employee")
+    List<EmpaddressInfo> findByEmployeeEntity(@Param("employee") Employee employee);
 }

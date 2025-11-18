@@ -31,5 +31,7 @@ public class QualificationDTO {
 		private String certificateFile; // Upload Certificate - can be base64 or file path (stored in EmpDocuments)
 		private Boolean isHighest; // To identify which is the highest qualification (used to set Employee.qualification_id)
 	}
+	
+	
 }
 

@@ -19,14 +19,20 @@ import com.employee.dto.EmpExperienceDetailsDTO;
 import com.employee.dto.EmpFamilyDetailsDTO;
 import com.employee.dto.EmployeeAgreementDetailsDto;
 import com.employee.dto.EmployeeBankDetailsResponseDTO;
+import com.employee.dto.FamilyDetailsResponseDTO;
 import com.employee.dto.ManagerDTO;
+import com.employee.dto.QualificationInfoDTO;
 import com.employee.dto.ReferenceDTO;
 import com.employee.dto.SkillTestResultDTO;
+import com.employee.dto.WorkingInfoDTO;
 import com.employee.entity.BankDetails;
 import com.employee.entity.EmpChequeDetails;
 import com.employee.entity.EmpDocuments;
 import com.employee.entity.EmpExperienceDetails;
+import com.employee.entity.EmpFamilyDetails;
 import com.employee.entity.EmpProfileView;
+import com.employee.entity.EmpQualification;
+import com.employee.entity.EmpaddressInfo;
 import com.employee.entity.Employee;
 import com.employee.entity.EmployeeOnboardingView;
 import com.employee.entity.SkillTestApprovalView;
@@ -37,6 +43,7 @@ import com.employee.repository.EmpDocumentsRepository;
 import com.employee.repository.EmpExperienceDetailsRepository;
 import com.employee.repository.EmpFamilyDetailsRepository;
 import com.employee.repository.EmpSubjectRepository;
+import com.employee.repository.EmpaddressInfoRepository;
 import com.employee.repository.EmployeeOnboardingRepository;
 import com.employee.repository.EmployeeProfileViewRepository;
 import com.employee.repository.EmployeeRepository;
@@ -57,6 +64,7 @@ public class GetEmpDetailsService {
 	@Autowired EmpChequeDetailsRepository empChequeDetailsRepository;
 	@Autowired SkillTestApprovalRepository skillTestApprovalRepository;
 	@Autowired EmpDocumentsRepository empDocumentsRepository;
+	@Autowired EmpaddressInfoRepository empAddressInfoRepo;
 	
 	
 	
@@ -332,6 +340,196 @@ public class GetEmpDetailsService {
 	       
 	        return response;
 	    }
+	  
+	  
+	  public WorkingInfoDTO getWorkingInfoByTempPayrollId(String tempPayrollId) {
+	        // 1. Fetch the Employee entity with all required joins
+	        Employee employee = employeeRepo.findWorkingInfoByTempPayrollId(tempPayrollId)
+	                .orElseThrow(() -> new RuntimeException("Employee not found with tempPayrollId: " + tempPayrollId)); // Use a custom Exception later
+
+	        // 2. Map the Employee entity to the DTO
+	        return mapToWorkingInfoDTO(employee);
+	    }
+
+	    private WorkingInfoDTO mapToWorkingInfoDTO(Employee e) {
+	        WorkingInfoDTO dto = new WorkingInfoDTO();
+	        
+	        // Employee entity fields
+	        dto.setTempPayrollId(e.getTempPayrollId());
+	        dto.setJoiningDate(e.getDate_of_join());
+
+	        // Campus related fields (via campus_id)
+	        if (e.getCampus_id() != null) {
+	            dto.setCampusName(e.getCampus_id().getCampusName());
+	            dto.setCampusCode(e.getCampus_id().getCmps_code());
+	            dto.setCampusType(e.getCampus_id().getCmps_type());
+	            
+	            // Location (assuming it's derived from the Campus's City)
+	            if (e.getCampus_id().getCity() != null) {
+	                dto.setLocation(e.getCampus_id().getCity().getCityName());
+	            }
+	        }
+
+	        // Note: Building Name is not directly mapped in your Employee entity.
+	        // You would need a separate fetch or a direct relationship to fill this.
+	        // For now, it is left null/empty.
+	        // dto.setBuildingName(...);
+
+	        // Related Employee entities (Manager, Hired By, Replacement)
+	        dto.setManagerName(formatEmployeeName(e.getEmployee_manager_id()));
+	        dto.setReplacementEmployeeName(formatEmployeeName(e.getEmployee_replaceby_id()));
+	        dto.setHiredByName(formatEmployeeName(e.getEmployee_hired()));
+	        
+	        // Working Mode, Joining As, Mode of Hiring
+	        if (e.getWorkingMode_id() != null) {
+	            dto.setWorkingModeType(e.getWorkingMode_id().getWork_mode_type());
+	        }
+	        if (e.getJoin_type_id() != null) {
+	            dto.setJoiningAsType(e.getJoin_type_id().getJoin_type());
+	        }
+	        
+	        // Assuming ModeOfHiring has a getType() method (based on entity naming pattern)
+	        if (e.getModeOfHiring_id() != null) {
+	            // Note: Assuming 'ModeOfHiring' entity exists and has a method to get the type.
+	            // Placeholder: Replace with actual method if different.
+	            // dto.setModeOfHiringType(e.getModeOfHiring_id().getModeOfHiringType());
+	        }
+
+	        return dto;
+	    }
+
+	    private String formatEmployeeName(Employee emp) {
+	        if (emp != null) {
+	            // Basic concatenation for display name
+	            return emp.getFirst_name() + " " + emp.getLast_name();
+	        }
+	        return null; // or "N/A"
+	    }
+	    
+	    public QualificationInfoDTO getHighestQualificationDetails(String tempPayrollId) {
+	        
+	        // 1. Fetch the Employee record with the highest qualification type
+	        Employee employee = employeeRepo.findHighestQualificationDetailsByTempPayrollId(tempPayrollId)
+	                .orElseThrow(() -> new RuntimeException("Employee not found with tempPayrollId: " + tempPayrollId));
+	        
+	        // 2. Fetch the corresponding detailed EmpQualification record
+	        EmpQualification empQualification = employeeRepo.findHighestEmpQualificationRecord(tempPayrollId)
+	                .orElseThrow(() -> new RuntimeException("Detailed qualification record not found."));
+
+	        // 3. Map the entities to the DTO
+	        return mapToQualificationInfoDTO(employee, empQualification);
+	    }
+
+	    private QualificationInfoDTO mapToQualificationInfoDTO(Employee e, EmpQualification eq) {
+	        QualificationInfoDTO dto = new QualificationInfoDTO();
+	        
+	        // Qualification (Sourced from Employee.qualification_id)
+	        if (e.getQualification_id() != null) {
+	            dto.setQualification(e.getQualification_id().getQualification_name());
+	        }
+	        
+	        // Degree, Specialisation, Passed Out Year (Sourced from EmpQualification)
+	        // Note: Assuming 'QualificationDegree' entity has a 'getDegree_name()' method
+	        if (eq.getQualification_degree_id() != null) {
+	            // Placeholder for Degree name
+	            // dto.setDegree(eq.getQualification_degree_id().getDegree_name());
+	             // Using the Qualification Name for Degree, matching the image example ("B.Tech" for both)
+	            if (e.getQualification_id() != null) {
+	                 dto.setDegree(e.getQualification_id().getQualification_name());
+	            }
+	        }
+	        
+	        dto.setSpecialisation(eq.getSpecialization());
+	        dto.setPassedOutYear(eq.getPassedout_year());
+	        
+	        // Academic Details (Sourced from EmpQualification)
+	        dto.setUniversity(eq.getUniversity());
+	        dto.setInstitute(eq.getInstitute());
+	        
+	        // Placeholder for certificate status
+	        dto.setCertificateStatus("Available");
+
+	        return dto;
+	    }
+	    
+	    public List<FamilyDetailsResponseDTO> getFamilyDetailsWithAddressInfo(String tempPayrollId) {
+	        
+	        // 1. Find the Employee
+	        Employee employee = employeeRepo.findByTempPayrollId(tempPayrollId)
+	                .orElseThrow(() -> new RuntimeException("Employee with tempPayrollId: " + tempPayrollId + " not found."));
+
+	        // 2. Fetch Family Details
+	        List<EmpFamilyDetails> familyDetailsList = empFamilyDetailsRepo.findByEmployeeEntity(employee);
+
+	        // 3. Determine State and Country from Address Info
+	        List<EmpaddressInfo> addresses = empAddressInfoRepo.findByEmployeeEntity(employee);
+
+	        String stateName = null;
+	        String countryName = null;
+	        
+	        Optional<EmpaddressInfo> permanentAddress = addresses.stream()
+	            .filter(a -> "PERM".equalsIgnoreCase(a.getAddrs_type()))
+	            .findFirst();
+	            
+	        Optional<EmpaddressInfo> currentAddress = addresses.stream()
+	            .filter(a -> "CURR".equalsIgnoreCase(a.getAddrs_type()))
+	            .findFirst();
+
+	        // Logic Implementation:
+	        boolean addressesExistAndAreIdentical = permanentAddress.isPresent()
+	                                               && currentAddress.isPresent()
+	                                               && permanentAddress.get().equals(currentAddress.get());
+	                                               // NOTE: equals() needs to be overridden in EmpaddressInfo
+	                                               // to compare relevant address fields (house_no, postal_code, etc.)
+
+	        if (addressesExistAndAreIdentical) {
+	            // Case 1: Both exist and are the same (take either)
+	            stateName = permanentAddress.get().getState_id().getStateName();
+	            countryName = permanentAddress.get().getCountry_id().getCountryName();
+	        } else if (permanentAddress.isPresent()) {
+	            // Case 2: Addresses are different, or only Permanent exists (take Permanent)
+	            stateName = permanentAddress.get().getState_id().getStateName();
+	            countryName = permanentAddress.get().getCountry_id().getCountryName();
+	        } else if (currentAddress.isPresent()) {
+	            // Case 3: Only Current address exists (Optional fall-back, use Current)
+	             stateName = currentAddress.get().getState_id().getStateName();
+	             countryName = currentAddress.get().getCountry_id().getCountryName();
+	        }
+	        
+	        // Use final variables for stream mapping
+	        final String finalStateName = stateName;
+	        final String finalCountryName = countryName;
+
+	        // 4. Map the entity list to the DTO response list
+	        return familyDetailsList.stream()
+	            .map(familyDetail -> {
+	                FamilyDetailsResponseDTO dto = new FamilyDetailsResponseDTO();
+	                
+	                // Map family member details
+	                String fullName = familyDetail.getFirst_name() + (familyDetail.getLast_name() != null ? " " + familyDetail.getLast_name() : "");
+	                dto.setName(fullName);
+	                
+	                // Assuming required getters exist on related entities
+	                dto.setRelation(familyDetail.getRelation_id().getStudentRelationType());
+	                dto.setBloodGroup(familyDetail.getBlood_group_id().getBloodGroupName());
+	                
+	                dto.setOccupation(familyDetail.getOccupation());
+	                dto.setEmailId(familyDetail.getEmail());
+	                dto.setPhoneNumber(familyDetail.getContact_no());
+	                dto.setNationality(familyDetail.getNationality());
+	                
+	                // Set the derived address info
+	                dto.setState(finalStateName);
+	                dto.setCountry(finalCountryName);
+	                
+	                return dto;
+	            })
+	            .collect(Collectors.toList());
+	    }
+	    
+	
+	    
+
 	    
 	    
 	    
